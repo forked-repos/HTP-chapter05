@@ -44,6 +44,8 @@ public class QuizFragment extends Fragment
    private Set<String> regionsSet; // world regions in current quiz
    private String correctAnswer; // correct country for the current flag
    private int totalGuesses; // number of guesses made
+   private boolean firstTry;
+   private int correctAnswersOnFirstTry; //count correct answers on first try
    private int correctAnswers; // number of correct guesses
    private int guessRows; // number of rows displaying guess Buttons
    private SecureRandom random; // used to randomize the quiz
@@ -153,6 +155,8 @@ public class QuizFragment extends Fragment
       
       correctAnswers = 0; // reset the number of correct answers made
       totalGuesses = 0; // reset the total number of guesses the user made
+      correctAnswersOnFirstTry = 0;
+      firstTry = true;
       quizCountriesList.clear(); // clear prior list of quiz countries
       
       int flagCounter = 1; 
@@ -183,7 +187,8 @@ public class QuizFragment extends Fragment
       // get file name of the next flag and remove it from the list
       String nextImage = quizCountriesList.remove(0);
       correctAnswer = nextImage; // update the correct answer
-      answerTextView.setText(""); // clear answerTextView 
+      answerTextView.setText(""); // clear answerTextView
+      firstTry = true;
 
       // display current question number
       questionNumberTextView.setText(
@@ -264,6 +269,9 @@ public class QuizFragment extends Fragment
          {
             ++correctAnswers; // increment the number of correct answers
 
+            if(firstTry){
+               correctAnswersOnFirstTry++;
+            }
             // display correct answer in green text
             answerTextView.setText(answer + "!");
             answerTextView.setTextColor(
@@ -288,7 +296,7 @@ public class QuizFragment extends Fragment
                         
                         builder.setMessage(
                            getResources().getString(R.string.results, 
-                           totalGuesses, (1000 / (double) totalGuesses)));
+                           totalGuesses, (1000 / (double) totalGuesses), correctAnswersOnFirstTry));
                         
                         // "Reset Quiz" Button                              
                         builder.setPositiveButton(R.string.reset_quiz,
@@ -325,6 +333,7 @@ public class QuizFragment extends Fragment
          } 
          else // guess was incorrect  
          {
+            firstTry = false;
             flagImageView.startAnimation(shakeAnimation); // play shake
 
             // display "Incorrect!" in red 
